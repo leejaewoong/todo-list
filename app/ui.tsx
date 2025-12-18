@@ -1,23 +1,29 @@
-'use client'
+"use client";
 
-import { input } from "@material-tailwind/react"
-import Todo from "../component/todo"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import Todo from "@/components/todo";
+import { Search, Plus } from "lucide-react";
 
 export default function UI() {
-    return (
-        <div className='flex flex-col items-center w-2/3 mx-auto py-10'>
-            <h1 className="text-xl">TODO List</h1>
-            <input 
-                label="Search TODO"
-                placeholder="Search TODO"
-                icon={<i className="fas fa-search"/>}
-            />
+  return (
+    <div className="w-2/3 mx-auto flex flex-col items-center py-10 gap-2">
+      <h1 className="text-xl">TODO LIST</h1>
 
-            <Todo 
-                id={1}
-                value={"New TODO"}
-                completed={false}
-                />
-        </div>
-    )
+      <div className="relative w-full">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Input
+          placeholder="Search TODO"
+          className="pl-10"
+        />
+      </div>
+
+      <Todo />
+
+      <Button className="w-full">
+        <Plus className="mr-2 h-4 w-4" />
+        ADD TODO
+      </Button>
+    </div>
+  );
 }
