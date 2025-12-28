@@ -4,22 +4,42 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Check, Pen, Trash2 } from "lucide-react";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { updateTodo } from "@/actions/todo-actions"
 
-export default function Todo({}) {
+export default function Todo({ todo }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [completed, setCompleted] = useState(false);
-  const [title, setTitle] = useState("테스트용 투두");
+  const [completed, setCompleted] = useState(todo.completed);
+  const [title, setTitle] = useState(todo.title);
+  const queryClient = useQueryClient();
+
+  const updateTodoMutation = useMutation({
+    mutationFn: () => updateTodo({
+      id: todo.id,
+      title,
+      completed
+    }),
+    onSuccess: () => {
+      setIsEditing(false);
+      queryClient.invalidateQueries({
+        queryKey: ["todos"]
+      });
+    }
+  })
 
   return (
     <div className="w-full flex items-center gap-1">
       <Checkbox
         checked={completed}
-        onCheckedChange={(checked) => setCompleted(checked === true)}
+        onCheckedChange={(checked) => {
+          setCompleted(checked as boolean);
+          updateTodoMutation.mutate();
+        }}
       />
 
       {isEditing ? (
         <input
-          className="flex-1 border-b-black border-b pb-1"
+          className="flex-1 border-b-black border-b pb-1 pl-2"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
