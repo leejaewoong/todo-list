@@ -33,12 +33,24 @@ export default function UI() {
       <h1 className="text-xl">TODO LIST</h1>
 
       <div className="relative w-full">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-1 top-1/2 transform -translate-y-1/2"
+          onClick={() => todosQuery.refetch()}
+        >
+          <Search className="h-4 w-4 text-gray-400" />
+        </Button>        
         <Input
           placeholder="Search TODO"
-          className="pl-10"
+          className="pl-3 py-5"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              todosQuery.refetch();
+            }
+          }}
         />
       </div>
 

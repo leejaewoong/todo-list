@@ -2,7 +2,7 @@
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Check, Pen, Trash2 } from "lucide-react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { updateTodo, deleteTodo } from "@/actions/todo-actions"
@@ -12,6 +12,14 @@ export default function Todo({ todo }) {
   const [completed, setCompleted] = useState(todo.completed);
   const [title, setTitle] = useState(todo.title);
   const queryClient = useQueryClient();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
 
   const updateTodoMutation = useMutation({
     mutationFn: () => updateTodo({
@@ -48,9 +56,16 @@ export default function Todo({ todo }) {
 
       {isEditing ? (
         <input
+          ref={inputRef}
           className="flex-1 border-b-black border-b pb-1 pl-2"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              updateTodoMutation.mutate();
+              setIsEditing(false);
+            }
+          }}
         />
       ) : (
         <p className={`flex-1 ${completed && "line-through"} ml-2`}>{title}</p>
