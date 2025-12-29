@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Check, Pen, Trash2 } from "lucide-react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { updateTodo } from "@/actions/todo-actions"
+import { updateTodo, deleteTodo } from "@/actions/todo-actions"
 
 export default function Todo({ todo }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -21,6 +21,15 @@ export default function Todo({ todo }) {
     }),
     onSuccess: () => {
       setIsEditing(false);
+      queryClient.invalidateQueries({
+        queryKey: ["todos"]
+      });
+    }
+  })
+
+  const deletedTodoMutation = useMutation({
+    mutationFn: () => deleteTodo(todo.id),
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["todos"]
       });
@@ -48,15 +57,31 @@ export default function Todo({ todo }) {
       )}
 
       {isEditing ? (
-        <Button variant="ghost" size="icon" onClick={() => setIsEditing(false)}>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          loading={updateTodoMutation.isPending} 
+          onClick={async () => {
+            await updateTodoMutation.mutate();
+            setIsEditing(false);
+        }}>
           <Check className="h-4 w-4" />
         </Button>
       ) : (
-        <Button variant="ghost" size="icon" onClick={() => setIsEditing(true)}>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => setIsEditing(true)}
+        >
           <Pen className="h-4 w-4" />
         </Button>
       )}
-      <Button variant="ghost" size="icon">
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        loading={deletedTodoMutation.isPending} 
+        onClick={() => deletedTodoMutation.mutate()}
+      >
         <Trash2 className="h-4 w-4" />
       </Button>
     </div>
